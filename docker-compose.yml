@@ -21,7 +21,7 @@ services:
   chroma:
     image: ghcr.io/chroma-core/chroma:latest
     environment:
-      - IS_PERSISTENT=FALSE
+      - IS_PERSISTENT=TRUE
     volumes:
       - ./data/chroma:/chroma/chroma/
     ports:
