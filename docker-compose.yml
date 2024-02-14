@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_PORT=11434
+    volumes:
+      - ./data/ollama:/root/.ollama
+    depends_on:
+      - chroma
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
+    environment:
+      - IS_PERSISTENT=FALSE
+    volumes:
+      - ./data/chroma:/chroma/chroma/
+    ports:
+      - 8000:8000

@@ -1,0 +1,22 @@
+{
+  "name": "poc-ollama",
+  "version": "1.0.0",
+  "description": "Proof of Concept Ollama + LLaMa + Langchain + Youtube",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/community": "^0.0.26",
+    "@langchain/core": "^0.1.28",
+    "chromadb": "^1.8.1",
+    "dotenv": "^16.4.1",
+    "faiss-node": "^0.5.1",
+    "langchain": "^0.1.17",
+    "youtube-transcript": "^1.0.6",
+    "youtubei.js": "^5.8.0"
+  }
+}
