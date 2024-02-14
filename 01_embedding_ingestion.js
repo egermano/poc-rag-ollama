@@ -17,8 +17,9 @@ const embeddings = new OllamaEmbeddings({
   model: 'llama2', // Default value
   requestOptions: {
     useMMap: true, // use_mmap 1
-    numThread: 12, // num_thread 6
+    numThread: 4, // num_thread 6
     numGpu: 1, // num_gpu 1
+    mainGpu: 0, // main_gpu 0
   },
 });
 
