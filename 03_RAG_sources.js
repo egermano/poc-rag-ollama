@@ -9,7 +9,6 @@ import {
   RunnableSequence,
 } from '@langchain/core/runnables';
 import dotenv from 'dotenv';
-import { formatDocumentsAsString } from 'langchain/util/document';
 
 dotenv.config();
 
@@ -29,13 +28,20 @@ const embeddings = new OllamaEmbeddings({
 });
 
 const vectorStore = new Chroma(embeddings, {
-  collectionName: process.CHROMA_COLLECTION,
+  collectionName: process.env.CHROMA_COLLECTION,
+  url: 'http://localhost:8000', // Optional, will default to this value
+  collectionMetadata: {
+    'hnsw:space': 'cosine',
+  }, // Optional, can be used to specify the distance method of the embedding space https://docs.trychroma.com/usage-guide#changing-the-distance-function
 });
 
 const main = async () => {
-  const retriever = vectorStore.asRetriever({});
-
-  const question = 'como vencer esse bloqueio para empreender na internet?';
+  const retriever = vectorStore.asRetriever({
+    k: 5,
+    verbose: true,
+    searchType: 'similarity',
+    metadata: true,
+  });
 
   const template = `Você é um assistente para tarefas de resposta a perguntas. 
     Use as seguintes partes do contexto para responder à pergunta no final.
@@ -50,20 +56,32 @@ const main = async () => {
 
   const prompt = PromptTemplate.fromTemplate(template);
 
-  const ragChainFromDocs = RunnableSequence.from([
-    RunnablePassthrough.assign({
-      context: (input) => formatDocumentsAsString(input.context),
-    }),
-    prompt,
-    model,
-    new StringOutputParser(),
-  ]);
+  const ragChainFromDocs = RunnableSequence.from(
+    [
+      RunnablePassthrough.assign({
+        context: (input) => {
+          return input.context.map(
+            (doc) =>
+              `content: ${doc.pageContent} \n metadata: ${JSON.stringify(
+                doc.metadata
+              )}`
+          );
+        },
+      }),
+      prompt,
+      model,
+      new StringOutputParser(),
+    ],
+    'ragChainFromDocs'
+  );
 
   let ragChainWithSource = new RunnableMap({
     steps: { context: retriever, question: new RunnablePassthrough() },
   });
 
   ragChainWithSource = ragChainWithSource.assign({ answer: ragChainFromDocs });
+
+  const question = 'Quais equipamentos o Bruno Germano usa para viajar e trabalhar?';
 
   const response = await ragChainWithSource.invoke(question);
 

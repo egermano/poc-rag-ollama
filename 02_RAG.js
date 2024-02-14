@@ -28,13 +28,17 @@ const embeddings = new OllamaEmbeddings({
 });
 
 const vectorStore = new Chroma(embeddings, {
-  collectionName: process.CHROMA_COLLECTION,
+  collectionName: process.env.CHROMA_COLLECTION,
+  url: 'http://localhost:8000', // Optional, will default to this value
+  collectionMetadata: {
+    'hnsw:space': 'cosine',
+  }, // Optional, can be used to specify the distance method of the embedding space https://docs.trychroma.com/usage-guide#changing-the-distance-function
 });
 
 const main = async () => {
   const retriever = vectorStore.asRetriever();
 
-  const question = 'Quais são os mercados multimilionários para mulheres?';
+  const question = 'Como começar a programar?';
 
   const template = `Você é um assistente para tarefas de resposta a perguntas. 
     Use as seguintes partes do contexto para responder à pergunta no final.
