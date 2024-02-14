@@ -8,7 +8,10 @@ import {
   RunnablePassthrough,
   RunnableSequence,
 } from '@langchain/core/runnables';
+import dotenv from 'dotenv';
 import { formatDocumentsAsString } from 'langchain/util/document';
+
+dotenv.config();
 
 const model = new Ollama({
   baseUrl: 'http://localhost:11434', // Default value
@@ -26,20 +29,18 @@ const embeddings = new OllamaEmbeddings({
 });
 
 const vectorStore = new Chroma(embeddings, {
-  collectionName: 'poc-ollama-embeddings',
+  collectionName: process.CHROMA_COLLECTION,
 });
 
 const main = async () => {
-  const retriever = vectorStore.asRetriever();
+  const retriever = vectorStore.asRetriever({});
 
-  const question = 'Qual linguagem eu deveria aprender a programar?';
+  const question = 'como vencer esse bloqueio para empreender na internet?';
 
   const template = `Você é um assistente para tarefas de resposta a perguntas. 
     Use as seguintes partes do contexto para responder à pergunta no final.
     Se você não sabe a resposta, apenas diga que não sabe, não tente inventar uma resposta.
     Use no máximo três frases e mantenha a resposta o mais concisa possível.
-
-    A resposta tem que ser no mesmo idioma da pergunta.
 
     Contexto: {context}
 
@@ -51,10 +52,7 @@ const main = async () => {
 
   const ragChainFromDocs = RunnableSequence.from([
     RunnablePassthrough.assign({
-      context: (input, callbacks) => {
-        const retrieverAndFormatter = retriever.pipe(formatDocumentsAsString);
-        return retrieverAndFormatter.invoke(input.question, callbacks);
-      },
+      context: (input) => formatDocumentsAsString(input.context),
     }),
     prompt,
     model,

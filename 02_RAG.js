@@ -7,7 +7,10 @@ import {
   RunnablePassthrough,
   RunnableSequence,
 } from '@langchain/core/runnables';
+import dotenv from 'dotenv';
 import { formatDocumentsAsString } from 'langchain/util/document';
+
+dotenv.config();
 
 const model = new Ollama({
   baseUrl: 'http://localhost:11434', // Default value
@@ -25,13 +28,13 @@ const embeddings = new OllamaEmbeddings({
 });
 
 const vectorStore = new Chroma(embeddings, {
-  collectionName: 'poc-ollama-embeddings',
+  collectionName: process.CHROMA_COLLECTION,
 });
 
 const main = async () => {
   const retriever = vectorStore.asRetriever();
 
-  const question = 'Como começar a programar?';
+  const question = 'Quais são os mercados multimilionários para mulheres?';
 
   const template = `Você é um assistente para tarefas de resposta a perguntas. 
     Use as seguintes partes do contexto para responder à pergunta no final.

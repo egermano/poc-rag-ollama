@@ -14,7 +14,7 @@
     "@langchain/core": "^0.1.28",
     "@obg-lab/youtube-channel-feed": "^0.2.4",
     "chromadb": "^1.8.1",
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.4.4",
     "faiss-node": "^0.5.1",
     "langchain": "^0.1.17",
     "youtube-transcript": "^1.0.6",
