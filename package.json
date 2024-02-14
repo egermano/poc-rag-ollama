@@ -12,6 +12,7 @@
   "dependencies": {
     "@langchain/community": "^0.0.26",
     "@langchain/core": "^0.1.28",
+    "@obg-lab/youtube-channel-feed": "^0.2.4",
     "chromadb": "^1.8.1",
     "dotenv": "^16.4.1",
     "faiss-node": "^0.5.1",

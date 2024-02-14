@@ -1,7 +1,8 @@
 import { OllamaEmbeddings } from '@langchain/community/embeddings/ollama';
 import { Ollama } from '@langchain/community/llms/ollama';
 import { Chroma } from '@langchain/community/vectorstores/chroma';
-// import { YoutubeLoader } from 'langchain/document_loaders/web/youtube';
+import { getChannelFeed } from '@obg-lab/youtube-channel-feed';
+import { YoutubeLoader } from 'langchain/document_loaders/web/youtube';
 
 const model = new Ollama({
   baseUrl: 'http://localhost:11434', // Default value
@@ -18,14 +19,22 @@ const embeddings = new OllamaEmbeddings({
   },
 });
 
+const getVideos = async () => {
+  const egermanoChannelId = 'UCBWbWViVqDHckknir8PIIdg';
+
+  const channelFeed = await getChannelFeed(egermanoChannelId);
+
+  const videos = channelFeed.feed.entry.map((entry) => {
+    return entry.link[0].$.href;
+  });
+
+  return videos;
+};
+
 const main = async () => {
   //load youtube video
-  const videoUrls = [
-    'https://www.youtube.com/watch?v=7Mj3DkHaMUI',
-    'https://www.youtube.com/watch?v=XB22IOgB3CY',
-    'https://www.youtube.com/watch?v=TrukLbhLgiw',
-    'https://www.youtube.com/watch?v=bD6a8_FNumI',
-  ];
+  const videoUrls = await getVideos();
+
   const loaders = videoUrls.map((video) =>
     YoutubeLoader.createFromUrl(video, {
       language: 'pt-BR',
@@ -50,15 +59,11 @@ const main = async () => {
   // Search for the most similar document
   console.log('docs stored on chroma');
 
-  const chain = prompt.pipe(model).pipe(retriever);
-
   const question = 'O que o Bruno Germano acha sobre a Starlink?';
 
-  const response = await chain.invoke({
-    question,
-  });
+  const response = await retriever.invoke(question);
 
-  console.log('response', response, res);
+  console.log('response', response);
 };
 
 main();

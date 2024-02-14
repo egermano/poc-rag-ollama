@@ -14,8 +14,6 @@ const outputParser = new StringOutputParser();
 
 const chain = prompt.pipe(model).pipe(outputParser);
 
-chain
-  .invoke({ question: 'O que é a Starlink?' })
-  .then((res) => {
-    console.log(res);
-  });
+chain.invoke({ question: 'O que é a Starlink?' }).then((res) => {
+  console.log(res);
+});
